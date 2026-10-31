@@ -64,13 +64,13 @@ impl Token {
             if (character.is_alphanumeric() || character == '_') && !(character == '"') {
                 let mut j = i;
                 let mut is_int = character.is_ascii_digit();
-                let mut isfloat = character.is_ascii_digit();
+                let mut is_float = false;
                 while character.is_alphanumeric() || character == '_' || character == '.' {
-                    if !character.is_ascii_digit() {
+                    if character == '.' && is_int {
+                        is_float = true;
                         is_int = false;
                     }
-                    if character == '.' && is_int {
-                        isfloat = true;
+                    if !character.is_ascii_digit() {
                         is_int = false;
                     }
                     j += 1;
@@ -81,7 +81,7 @@ impl Token {
                     tokens.push(Token::new(token, TokenType::Keyword, lexer::get_line_number(&code, i)));
                 } else if is_int {
                     tokens.push(Token::new(token, TokenType::IntConstant, lexer::get_line_number(&code, i)));
-                } else if isfloat {
+                } else if is_float {
                     tokens.push(Token::new(token, TokenType::FloatConstant, lexer::get_line_number(&code, i)));
                 } else {
                     tokens.push(Token::new(token, TokenType::Identifier, lexer::get_line_number(&code, i)));
