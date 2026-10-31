@@ -5,6 +5,8 @@
 #define MACRO2 MACRO1 MACRO
 
 int main() {
+    const float test = 1.5;
+    const char character = 'f';
     printf("Hello, World!");
     return MACRO;
 }  // this is a comment

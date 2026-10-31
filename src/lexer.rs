@@ -40,7 +40,7 @@ pub(crate) fn is_keyword(token: &str) -> bool {
     let keywords = [
         "if", "else", "while", "do", "break", "continue", "int", "double", "float", "return",
         "char", "case", "sizeof", "long", "short", "typedef", "switch", "unsigned", "void",
-        "static", "struct", "goto", "define", "include",
+        "static", "struct", "goto", "define", "include", "const"
     ];
     keywords.contains(&token)
 }

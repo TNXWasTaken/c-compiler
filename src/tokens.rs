@@ -64,8 +64,13 @@ impl Token {
             if (character.is_alphanumeric() || character == '_') && !(character == '"') {
                 let mut j = i;
                 let mut is_int = character.is_ascii_digit();
-                while character.is_alphanumeric() || character == '_' {
+                let mut isfloat = character.is_ascii_digit();
+                while character.is_alphanumeric() || character == '_' || character == '.' {
                     if !character.is_ascii_digit() {
+                        is_int = false;
+                    }
+                    if character == '.' && is_int {
+                        isfloat = true;
                         is_int = false;
                     }
                     j += 1;
@@ -76,6 +81,8 @@ impl Token {
                     tokens.push(Token::new(token, TokenType::Keyword, lexer::get_line_number(&code, i)));
                 } else if is_int {
                     tokens.push(Token::new(token, TokenType::IntConstant, lexer::get_line_number(&code, i)));
+                } else if isfloat {
+                    tokens.push(Token::new(token, TokenType::FloatConstant, lexer::get_line_number(&code, i)));
                 } else {
                     tokens.push(Token::new(token, TokenType::Identifier, lexer::get_line_number(&code, i)));
                 }
@@ -95,6 +102,21 @@ impl Token {
                 }
                 let token = code[i..=j].to_string();
                 tokens.push(Token::new(token, TokenType::StringConstant, lexer::get_line_number(&code, i)));
+                i = j + 1;
+                continue;
+            }
+            if character == "'".chars().next().unwrap() {
+                let mut j = i + 1;
+                character = code.chars().nth(j).unwrap();
+                while character != "'".chars().next().unwrap() {
+                    if j > code.len() {
+                        panic!("Unclosed char literal");
+                    }
+                    j += 1;
+                    character = code.chars().nth(j).unwrap();
+                }
+                let token = code[i..=j].to_string();
+                tokens.push(Token::new(token, TokenType::CharConstant, lexer::get_line_number(&code, i)));
                 i = j + 1;
                 continue;
             }
