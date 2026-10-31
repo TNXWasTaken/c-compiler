@@ -1,17 +1,24 @@
-use std::{fs, io::Write};
+mod lexer;
+mod tokens;
+mod pre_proccessor;
 
-fn compile(contents: String)-> Result<(), Box<dyn std::error::Error>> {
+use std::{fs, io::Write};
+use tokens::Token;
+
+fn compile(contents: &str)-> Result<(), Box<dyn std::error::Error>> {
+    let stripped_code = pre_proccessor::remove_comments(contents);
+    let mut out_file = fs::File::create(r#"F:\git_repos\c-compiler\main.o"#)?;
+    let tokens = Token::from_string(stripped_code);
     let mut out = String::new();
-    let mut out_file = fs::File::create("/workspaces/c-compiler/main.o")?;
-    for line in contents.lines() {
-        out += line.split("//").nth(0).unwrap_or(line);
-        out += "\n";
+    for token in pre_proccessor::expand_macros(tokens) {
+        out += &token.to_string();
     }
+
     out_file.write_all(&out.into_bytes())?;
     Ok(())
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let contents: String = fs::read_to_string("/workspaces/c-compiler/main.c").unwrap();
-    return compile(contents);
+    let contents: &str = &*fs::read_to_string(r#"F:\git_repos\c-compiler\main.c"#).unwrap();
+    compile(contents)
 }
