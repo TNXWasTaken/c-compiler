@@ -1,5 +1,6 @@
 use crate::tokens::Token;
 use crate::tokens::TokenType;
+use std::collections::HashMap;
 
 pub(crate) fn remove_comments(code: &str) -> String {
     code.lines().map(|line|
@@ -11,8 +12,6 @@ pub(crate) fn remove_comments(code: &str) -> String {
         {comment}
     ).collect()
 }
-
-use std::collections::HashMap;
 
 pub(crate) fn expand_macros(tokens: Vec<Token>) -> Vec<Token> {
     let mut macros: HashMap<String, Vec<Token>> = HashMap::new();
