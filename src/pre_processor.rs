@@ -60,3 +60,17 @@ fn expand(
     }
     out.push(token);
 }
+
+pub(crate) fn process_headers(tokens: Vec<Token>) {
+    let mut output: Vec<Token> = Vec::new();
+    let mut iter = tokens.into_iter().peekable();
+
+    while let Some(token) = iter.next() {
+        if token.token == "#"
+            && iter.peek().is_some_and(|t| t.token == "include" && t.line == token.line)
+        {
+            iter.next();
+            
+        }
+    }
+}

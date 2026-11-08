@@ -10,7 +10,8 @@ pub(crate) enum TokenType {
     CharConstant,
     Keyword,
     Operator,
-    Identifier
+    Identifier,
+    Error
 }
 
 impl TokenType {
@@ -34,6 +35,7 @@ impl TokenType {
             TokenType::Keyword => "Keyword".to_string(),
             TokenType::Operator => "Operator".to_string(),
             TokenType::Identifier => "Identifier".to_string(),
+            TokenType::Error => "Error".to_string(),
         }
     }
 }
@@ -50,7 +52,7 @@ impl Token {
         Self { token, token_type, line }
     }
 
-    pub(crate) fn from_string(code: String) -> Vec<Token> {
+    pub(crate) fn from_string(code: &str) -> Vec<Token> {
         let mut tokens: Vec<Token> = Vec::new();
         let mut i = 0;
         while i < code.len() {
@@ -130,3 +132,105 @@ impl Token {
         r#"""#.to_owned() + self.token.as_str() + r#"" is a "# + &*self.token_type.to_string() + " on line " + &*self.line.to_string() + "\n"
     }
 }
+
+// struct Line {
+//     tokens: Vec<Token>
+// }
+//
+// impl Line {
+//     pub fn push(&mut self, token: Token) {
+//         self.tokens.push(token);
+//     }
+// }
+//
+// pub(crate) struct TokenManager {
+//     lines: Vec<Line>
+// }
+//
+// impl TokenManager {
+//     pub(crate) fn from_string(code: &str) -> Self {
+//         let mut tokens: Vec<Token> = Vec::new();
+//         let mut lines: Vec<Line> = Vec::new();
+//         let mut token: Token = Token::new("".parse().unwrap(), TokenType::Error, 1);
+//         let mut current_line = Line { tokens: Vec::new() };
+//         let mut i = 0;
+//         while i < code.len() {
+//             let mut character = code.chars().nth(i).unwrap();
+//             let punctuator = lexer::match_punctuator(&code[i..min(i+3, code.len())]);
+//             let line = lexer::get_line_number(&code, i);
+//             if lines.len() < line {
+//                 lines.push(current_line);
+//                 current_line = Line { tokens: vec!(token.clone()) };
+//                 current_line =
+//             }
+//             if punctuator.is_some() {
+//                 token = Token::new(punctuator.unwrap().parse().unwrap(), TokenType::Punctuator, lexer::get_line_number(&code, i));
+//                 i += punctuator.unwrap().len();
+//                 continue;
+//             }
+//             if (character.is_alphanumeric() || character == '_') && !(character == '"') {
+//                 let mut j = i;
+//                 let mut is_int = character.is_ascii_digit();
+//                 let mut is_float = false;
+//                 while character.is_alphanumeric() || character == '_' || character == '.' {
+//                     if character == '.' && is_int {
+//                         is_float = true;
+//                         is_int = false;
+//                     }
+//                     if !character.is_ascii_digit() {
+//                         is_int = false;
+//                     }
+//                     j += 1;
+//                     character = code.chars().nth(j).unwrap();
+//                 }
+//                 let token_text = code[i..j].to_string();
+//                 if lexer::is_keyword(&token_text) {
+//                     token = Token::new(token_text, TokenType::Keyword, lexer::get_line_number(&code, i));
+//                 } else if is_int {
+//                     token = Token::new(token_text, TokenType::IntConstant, lexer::get_line_number(&code, i));
+//                 } else if is_float {
+//                     token = Token::new(token_text, TokenType::FloatConstant, lexer::get_line_number(&code, i));
+//                 } else {
+//                     token = Token::new(token_text, TokenType::Identifier, lexer::get_line_number(&code, i));
+//                 }
+//
+//                 i = j;
+//                 continue;
+//             }
+//             if character == '"' {
+//                 let mut j = i + 1;
+//                 character = code.chars().nth(j).unwrap();
+//                 while character != '"' {
+//                     if j > code.len() {
+//                         panic!("Unclosed string literal");
+//                     }
+//                     j += 1;
+//                     character = code.chars().nth(j).unwrap();
+//                 }
+//                 let token = code[i..=j].to_string();
+//                 tokens.push(Token::new(token, TokenType::StringConstant, lexer::get_line_number(&code, i)));
+//                 i = j + 1;
+//                 continue;
+//             }
+//             if character == "'".chars().next().unwrap() {
+//                 let mut j = i + 1;
+//                 character = code.chars().nth(j).unwrap();
+//                 while character != "'".chars().next().unwrap() {
+//                     if j > code.len() {
+//                         panic!("Unclosed char literal");
+//                     }
+//                     j += 1;
+//                     character = code.chars().nth(j).unwrap();
+//                 }
+//                 let token = code[i..=j].to_string();
+//                 tokens.push(Token::new(token, TokenType::CharConstant, lexer::get_line_number(&code, i)));
+//                 i = j + 1;
+//                 continue;
+//             }
+//
+//             i += 1;
+//
+//         }
+//         TokenManager { lines }
+//     }
+// }
