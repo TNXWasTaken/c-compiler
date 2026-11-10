@@ -118,6 +118,9 @@ impl Token {
                     character = code.chars().nth(j).unwrap();
                 }
                 let token = code[i..=j].to_string();
+                if token[0..token.len()-1].as_bytes().len() != 1 {
+                    panic!("Char literal with byte contents greater than one")
+                }
                 tokens.push(Token::new(token, TokenType::CharConstant, lexer::get_line_number(&code, i)));
                 i = j + 1;
                 continue;
