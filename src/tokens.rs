@@ -1,5 +1,6 @@
 use std::cmp::min;
 use crate::lexer;
+use crate::error::*;
 
 #[derive(PartialEq, Clone)]
 pub(crate) enum TokenType {
@@ -52,7 +53,7 @@ impl Token {
         Self { token, token_type, line }
     }
 
-    pub(crate) fn from_string(code: &str) -> Vec<Token> {
+    pub(crate) fn from_string(code: &str) -> Result<Vec<Token>, CompilerError> {
         let mut tokens: Vec<Token> = Vec::new();
         let mut i = 0;
         while i < code.len() {
@@ -119,7 +120,15 @@ impl Token {
                 }
                 let token = code[i..=j].to_string();
                 if token[0..token.len()-1].as_bytes().len() != 1 {
-                    panic!("Char literal with byte contents greater than one")
+                    let line_start = code[..i].rfind('\n').map_or(0, |p| p + 1);
+                    let line_end = code[i..].find('\n').map_or(code.len(), |p| i + p);
+
+                    return Err(CompilerError {
+                        error_type: ErrorType::MultiByteCharLiteral,
+                        line: lexer::get_line_number(&code, i),
+                        line_text: code[line_start..line_end].to_string(),
+                        underline_section: (i - line_start, j + 1 - line_start),
+                    })
                 }
                 tokens.push(Token::new(token, TokenType::CharConstant, lexer::get_line_number(&code, i)));
                 i = j + 1;
@@ -128,7 +137,7 @@ impl Token {
 
             i += 1;
         }
-        tokens
+        Ok(tokens)
     }
 
     pub(crate) fn to_string(&self) -> String {
